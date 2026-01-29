@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Signup from "./components/Signup";
 import Login from "./components/Login";
 import Home from "./components/Home";
@@ -30,11 +30,41 @@ function Protected({ children }) {
   return session ? children : <Navigate to="/login" />;
 }
 
+// Component to handle Supabase email verification/magic link
+function VerifyRedirect() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const access_token = urlParams.get("access_token");
+
+    if (access_token) {
+      supabase.auth
+        .setSession({ access_token })
+        .then(() => {
+          // Email verified → redirect to login
+          navigate("/login");
+        })
+        .catch(() => {
+          // Token invalid → fallback
+          navigate("/signup");
+        });
+    } else {
+      // No token → fallback
+      navigate("/signup");
+    }
+  }, [navigate]);
+
+  return <p>Verifying your account...</p>;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/signup" />} />
+        {/* Root route now handles verification links */}
+        <Route path="/" element={<VerifyRedirect />} />
+
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
         <Route
