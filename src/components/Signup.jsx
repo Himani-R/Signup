@@ -1,36 +1,36 @@
 import { useState } from "react";
 import { supabase } from "../supabase/client";
+import { useNavigate } from "react-router-dom";
 import "./auth.css";
 
 function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
+  const navigate = useNavigate();
 
   const handleSignup = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      emailRedirectTo: "https://signup-xht7.vercel.app/login",
-    },
-  });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `signup-xht7.vercel.app/login`,
+      },
+    });
 
-  if (error) {
-    if (error.message.includes("already")) {
-      setMsg("Account already exists. Redirecting to login...");
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 1500);
+    if (error) {
+      if (error.message.includes("already")) {
+        setMsg("Account already exists. Redirecting to login...");
+        setTimeout(() => navigate("/login"), 1500);
+      } else {
+        setMsg(error.message);
+      }
     } else {
-      setMsg(error.message);
+      setMsg("Check your email to verify 📧");
     }
-  } else {
-    setMsg("Check your email to verify 📧");
-  }
-};
+  };
 
   return (
     <div className="auth-container">
@@ -40,29 +40,32 @@ function Signup() {
           <input
             type="email"
             placeholder="Email"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
           />
           <input
             type="password"
             placeholder="Password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="new-password"
           />
           <button type="submit">Create Account</button>
         </form>
         <p className="auth-msg">{msg}</p>
         <p className="auth-msg">
-  Already have an account?{" "}
-  <span
-    style={{ cursor: "pointer", fontWeight: "bold" }}
-    onClick={() => window.location.href = "/login"}
-  >
-    Login
-  </span>
-</p>
+          Already have an account?{" "}
+          <span
+            style={{ cursor: "pointer", fontWeight: "bold" }}
+            onClick={() => navigate("/login")}
+          >
+            Login
+          </span>
+        </p>
       </div>
-      
     </div>
   );
 }

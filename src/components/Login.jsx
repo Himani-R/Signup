@@ -19,12 +19,15 @@ function Login() {
 
     if (error) {
       setMsg(error.message);
-    } else if (!data.user.email_confirmed_at) {
-      setMsg("Please verify your email first");
-      await supabase.auth.signOut();
-    } else {
-      navigate("/Home");
+      return;
     }
+
+    if (!data.session) {
+      setMsg("Please verify your email first 📧");
+      return;
+    }
+
+    navigate("/home");
   };
 
   return (
@@ -35,27 +38,31 @@ function Login() {
           <input
             type="email"
             placeholder="Email"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
           />
           <input
             type="password"
             placeholder="Password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
           />
           <button type="submit">Login</button>
         </form>
         <p className="auth-msg">{msg}</p>
         <p className="auth-msg">
-  Don’t have an account?{" "}
-  <span
-    style={{ cursor: "pointer", fontWeight: "bold" }}
-    onClick={() => window.location.href = "/"}
-  >
-    Register
-  </span>
-</p>
+          Don’t have an account?{" "}
+          <span
+            style={{ cursor: "pointer", fontWeight: "bold" }}
+            onClick={() => navigate("/signup")}
+          >
+            Register
+          </span>
+        </p>
       </div>
     </div>
   );
