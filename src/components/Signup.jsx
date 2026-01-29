@@ -14,7 +14,7 @@ function Signup() {
     email,
     password,
     options: {
-      emailRedirectTo: "https://Signup.vercel.app/login",
+      emailRedirectTo: "https://signup-xht7.vercel.app/login",
     },
   });
 
