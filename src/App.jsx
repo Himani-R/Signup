@@ -34,26 +34,21 @@ function Protected({ children }) {
 function VerifyRedirect() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const access_token = urlParams.get("access_token");
+useEffect(() => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const access_token = urlParams.get("access_token");
 
-    if (access_token) {
-      supabase.auth
-        .setSession({ access_token })
-        .then(() => {
-          // Email verified → redirect to login
-          navigate("/login");
-        })
-        .catch(() => {
-          // Token invalid → fallback
-          navigate("/signup");
-        });
-    } else {
-      // No token → fallback
-      navigate("/signup");
-    }
-  }, [navigate]);
+  if (access_token) {
+    supabase.auth
+      .setSession({ access_token })
+      .then(() => navigate("/login")) // Email verified → go to login
+      .catch(() => navigate("/signup")); // Token invalid → fallback
+  } else {
+    // If no token in URL, you can show default page or redirect
+    // For verification links, this shouldn’t happen, but fallback to login:
+    navigate("/login");
+  }
+}, [navigate]);
 
   return <p>Verifying your account...</p>;
 }
